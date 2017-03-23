@@ -4,7 +4,7 @@ This is a script service to login/logout for CSU CMCC Web Eportal.
 
 # Install / 安装
 Put this script somewhere easy to access so that you can execute it easily.  
-把这个脚本放在你随时能够得到的地方～
+把这个脚本放在你随时能够得到的地方～  
 Don't forget to give it +x permission.  
 记得给它+x的运行权限。
 ```bash
