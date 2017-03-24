@@ -1,5 +1,14 @@
 #!/bin/bash
 
+TMP_CACHE_DIR="/tmp/eporal-manager"
+DEBUG=false
+REDIRECT_OUTPUT="/dev/stdout"
+REDIRECT_ERROR="/dev/stderr"
+if [[ $DEBUG == false ]]; then
+	REDIRECT_OUTPUT="/dev/null"
+	REDIRECT_ERROR="/dev/null"
+fi
+
 eportal_login()
 {
 	EPORTAL_USER=$1
@@ -7,10 +16,10 @@ eportal_login()
 	_RET_VAL=$3
 
 	if [[ $EPORTAL_USER && $EPORTAL_PWD ]]; then
-		rm -r /tmp/netstuff 1>/dev/null 2>&1
+		rm -r $TMP_CACHE_DIR 1>${REDIRECT_OUTPUT} 2>${REDIRECT_ERROR}
 		echo "Logging in..."
-		wget http://www.bing.com/ -P /tmp/netstuff 1>/dev/null 2>&1
-		raw_html=`cat /tmp/netstuff/index.html`
+		wget http://www.bing.com/ -P $TMP_CACHE_DIR  1>${REDIRECT_OUTPUT} 2>${REDIRECT_ERROR}
+		raw_html=`cat $TMP_CACHE_DIR/index.html`
 
 		if [[ ${raw_html:0:8} != "<script>" ]]; then
 			echo "Already login."
@@ -18,12 +27,12 @@ eportal_login()
 			portal_url=`echo $raw_html | sed -s "s/^<script>top.self.location.href='\(.*\)'<\/script>\(.*\)/\1/"`
 			login_url=`echo "$portal_url&username=$EPORTAL_USER&pwd=$EPORTAL_PWD" | sed -s "s/\(.*\)index.jsp?\(.*\)/\1webGateModeV2.do?method=login\&\2/"`
 			#echo $login_url
-			wget $login_url -P /tmp/netstuff 1>/dev/null 2>&1
-			wget $login_url -P /tmp/netstuff 1>/dev/null 2>&1
-			rm -r /tmp/netstuff
+			wget $login_url -P $TMP_CACHE_DIR  1>${REDIRECT_OUTPUT} 2>${REDIRECT_ERROR}
+			wget $login_url -P $TMP_CACHE_DIR  1>${REDIRECT_OUTPUT} 2>${REDIRECT_ERROR}
+			rm -r $TMP_CACHE_DIR
 
-			wget http://www.bing.com/ -P /tmp/netstuff 1>/dev/null 2>&1
-			raw_html=`cat /tmp/netstuff/index.html`
+			wget http://www.bing.com/ -P $TMP_CACHE_DIR  1>${REDIRECT_OUTPUT} 2>${REDIRECT_ERROR}
+			raw_html=`cat $TMP_CACHE_DIR/index.html`
 			if [[ ${raw_html:0:8} != "<script>" ]]; then
 				echo "Login."
 			else
@@ -31,7 +40,7 @@ eportal_login()
 			fi
 		fi
 
-		rm -r /tmp/netstuff
+		rm -r $TMP_CACHE_DIR
 		eval $_RET_VAL=1
 	else
 		eval $_RET_VAL=0
